@@ -3,11 +3,11 @@ FROM python:3.8
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install base Dependencies
+# Install base Dependencies (FIX: ruby -> ruby-dev)
 RUN apt-get update -qq \
-	&& apt-get install -y -qq python-tk tk-dev libffi-dev libssl-dev pandoc \
+	&& apt-get install -y -qq python3-tk tk-dev libffi-dev libssl-dev pandoc \
 	libgmp3-dev libzbar-dev tesseract-ocr xsel libpoppler-cpp-dev libmpc-dev \
-	libdbus-glib-1-dev ruby libenchant-2-dev apktool nodejs groff binwalk \
+	libdbus-glib-1-dev ruby-dev libenchant-2-dev apktool nodejs groff binwalk \
 	foremost tcpflow poppler-utils exiftool steghide stegsnow bison ffmpeg \
 	libgd-dev less \
 	# Clean up for smaller images
@@ -39,10 +39,12 @@ RUN make
 RUN cp /usr/snow-20130616/snow /usr/local/bin/snow && chmod +x /usr/local/bin/snow
 
 # Clone Katana Repository
-RUN git clone --recursive https://github.com/JohnHammond/katana.git /katana
+RUN git clone --recursive https://github.com/juliancasaburi/katana.git /katana
 # Install katana python dependencies
 WORKDIR /katana
 RUN pip install -r requirements.txt
+RUN pip install colorama # FIX colorama error
+RUN pip install pyelftools==0.29 # FIX: https://github.com/Gallopsled/pwntools/issues/2260
 
 # Create runtime data directory directory
 RUN mkdir /data
